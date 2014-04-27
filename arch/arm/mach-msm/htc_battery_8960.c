@@ -39,6 +39,11 @@
 #include <mach/htc_gauge.h>
 #include <mach/htc_charger.h>
 #include <mach/htc_battery_cell.h>
+
+#ifdef CONFIG_FORCE_FAST_CHARGE
+#include <linux/fastchg.h>
+#endif
+
 #define MSPERIOD(end, start)	ktime_to_ms(ktime_sub(end, start))
 
 #define HTC_BATT_CHG_DIS_BIT_EOC	(1)
@@ -651,9 +656,26 @@ static void cable_status_notifier_func(enum usb_connect_type online)
 
 	switch (online) {
 	case CONNECT_TYPE_USB:
+#ifdef CONFIG_FORCE_FAST_CHARGE
+		/* If forced fast charge is enabled "always" or if no USB device detected, go AC */
+		if ((force_fast_charge == FAST_CHARGE_FORCE_AC) ||
+		    (force_fast_charge == FAST_CHARGE_FORCE_AC_IF_NO_USB &&
+       	             USB_peripheral_detected == USB_ACC_NOT_DETECTED        )) {
+			BATT_LOG("cable USB forced to AC");
+			is_fast_charge_forced = FAST_CHARGE_FORCED;
+			current_charge_mode = CURRENT_CHARGE_MODE_AC;
+			htc_charger_event_notify(HTC_CHARGER_EVENT_SRC_AC);
+		} else {
+			BATT_LOG("cable USB not forced to AC");
+			is_fast_charge_forced = FAST_CHARGE_NOT_FORCED;
+			current_charge_mode = CURRENT_CHARGE_MODE_USB;
+			htc_charger_event_notify(HTC_CHARGER_EVENT_SRC_USB);
+		}
+#else
 		BATT_LOG("USB charger");
 		htc_charger_event_notify(HTC_CHARGER_EVENT_SRC_USB);
-		
+		/* radio_set_cable_status(CHARGER_USB); */
+#endif
 		break;
 	case CONNECT_TYPE_AC:
 		BATT_LOG("5V AC charger");
@@ -2794,4 +2816,5 @@ static int __init htc_battery_init(void)
 module_init(htc_battery_init);
 MODULE_DESCRIPTION("HTC Battery Driver");
 MODULE_LICENSE("GPL");
+
 
