@@ -51,7 +51,9 @@ struct cpufreq_stats {
 	unsigned int last_index;
 	cputime64_t *time_in_state;
 	unsigned int *freq_table;
-	unsigned int *trans_table;
+#ifdef CONFIG_CPU_FREQ_STAT_DETAILS
+  	unsigned int *trans_table;
+#endif
 
 };
 
@@ -166,6 +168,7 @@ static ssize_t show_overall_time_in_state(struct kobject *kobj,
 }
 
 
+#ifdef CONFIG_CPU_FREQ_STAT_DETAILS
 static ssize_t show_trans_table(struct cpufreq_policy *policy, char *buf)
 {
 	ssize_t len = 0;
@@ -210,6 +213,7 @@ static ssize_t show_trans_table(struct cpufreq_policy *policy, char *buf)
 	return len;
 }
 CPUFREQ_STATDEVICE_ATTR(trans_table, 0444, show_trans_table);
+#endif
 
 CPUFREQ_STATDEVICE_ATTR(total_trans, 0444, show_total_trans);
 CPUFREQ_STATDEVICE_ATTR(time_in_state, 0444, show_time_in_state);
@@ -221,7 +225,9 @@ CPUFREQ_STATDEVICE_ATTR(overall_total_trans, 0444, (show)show_overall_total_tran
 static struct attribute *default_attrs[] = {
 	&_attr_total_trans.attr,
 	&_attr_time_in_state.attr,
-	&_attr_trans_table.attr,
+#ifdef CONFIG_CPU_FREQ_STAT_DETAILS
+  	&_attr_trans_table.attr,
+#endif
 	NULL
 };
 
@@ -319,7 +325,9 @@ static int cpufreq_stats_create_table(struct cpufreq_policy *policy,
 
 	alloc_size = count * sizeof(int) + count * sizeof(cputime64_t);
 
-	alloc_size += count * count * sizeof(int);
+#ifdef CONFIG_CPU_FREQ_STAT_DETAILS
+  	alloc_size += count * count * sizeof(int);
+#endif
 	stat->max_state = count;
 	stat->time_in_state = kzalloc(alloc_size, GFP_KERNEL);
 	if (!stat->time_in_state) {
@@ -328,7 +336,9 @@ static int cpufreq_stats_create_table(struct cpufreq_policy *policy,
 	}
 	stat->freq_table = (unsigned int *)(stat->time_in_state + count);
 
-	stat->trans_table = stat->freq_table + count;
+#ifdef CONFIG_CPU_FREQ_STAT_DETAILS
+  	stat->trans_table = stat->freq_table + count;
+#endif
 	j = 0;
 	for (i = 0; table[i].frequency != CPUFREQ_TABLE_END; i++) {
 		unsigned int freq = table[i].frequency;
@@ -402,7 +412,9 @@ static int cpufreq_stat_notifier_trans(struct notifier_block *nb,
 	}
 
 	stat->last_index = new_index;
-	stat->trans_table[old_index * stat->max_state + new_index]++;
+#ifdef CONFIG_CPU_FREQ_STAT_DETAILS
+  	stat->trans_table[old_index * stat->max_state + new_index]++;
+#endif
 	stat->total_trans++;
 
 	if (freq->cpu == 0)
@@ -417,7 +429,7 @@ static int cpufreq_stat_notifier_trans(struct notifier_block *nb,
 	return 0;
 }
 
-static int cpufreq_stat_cpu_callback(struct notifier_block *nfb,
+static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 					       unsigned long action,
 					       void *hcpu)
 {
