@@ -579,6 +579,9 @@ static void report_psensor_input_event(struct cm3629_info *lpi, int interrupt_fl
 	} else {
 		val = (interrupt_flag == 2) ? 0 : 1;
 	}
+#ifdef CONFIG_POCKET_DETECT
+	ps_near = !val;
+#endif
 
 	if (lpi->ps_debounce == 1 && lpi->mfg_mode != MFG_MODE) {
 		if (val == 0) {
@@ -2590,6 +2593,7 @@ int pocket_detection_check(void)
 	return (ps_near);
 }
 #endif
+
 int psensor_enable_by_touch_driver(int on)
 {
 	struct cm3629_info *lpi = lp_info;
