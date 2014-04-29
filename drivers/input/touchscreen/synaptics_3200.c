@@ -225,7 +225,7 @@ static void syn_page_select(struct i2c_client *client, uint8_t page)
 static int i2c_syn_read(struct i2c_client *client, uint16_t addr, uint8_t *data, uint16_t length)
 {
 	uint8_t retry, buf;
-#define SYANPTICS_I2C_RETRY 10
+
 	struct i2c_msg msg[] = {
 		{
 			.addr = client->addr,
@@ -244,17 +244,19 @@ static int i2c_syn_read(struct i2c_client *client, uint16_t addr, uint8_t *data,
 
 	mutex_lock(&syn_mutex);
 	syn_page_select(client, addr >> 8);
-	for (retry = 0; retry < SYANPTICS_I2C_RETRY; retry++) {
+	for (retry = 0; retry < SYN_I2C_RETRY_TIMES; retry++) {
 		if (i2c_transfer(client->adapter, msg, 2) == 2)
 			break;
-	if (retry == SYANPTICS_I2C_RETRY) {
-		printk(KERN_INFO "[TP] i2c_read retry over %d\n",
-			SYANPTICS_I2C_RETRY);
-		return -EIO;
-	} else
-		msleep(10);
+		hr_msleep(10);
 	}
 	mutex_unlock(&syn_mutex);
+
+	if (retry == SYN_I2C_RETRY_TIMES) {
+		printk(KERN_INFO "[TP] i2c_read retry over %d\n",
+			SYN_I2C_RETRY_TIMES);
+		return -EIO;
+	}
+
 	return 0;
 }
 
@@ -1766,7 +1768,6 @@ enum SR_REG_STATE{
 static char *vk_name = "virtualkeys.sr_touchscreen";
 static struct kobj_attribute vk_dev;
 
-
 static int register_sr_touch_device(void)
 {
 	struct synaptics_ts_data *ts = gl_ts;
@@ -2192,7 +2193,8 @@ static int synaptics_init_panel(struct synaptics_ts_data *ts)
 static void synaptics_ts_finger_func(struct synaptics_ts_data *ts)
 {
 	int ret;
-	uint8_t buf[ts->finger_support * 8 ], noise_index[10], noise_state = 0;
+	uint8_t buf[ts->finger_support * 8 ], noise_index[10];
+	uint16_t temp_im = 0, temp_cidim = 0;
 	static int x_pos[10] = {0}, y_pos[10] = {0};
 
 	memset(buf, 0x0, sizeof(buf));
@@ -2204,15 +2206,9 @@ static void synaptics_ts_finger_func(struct synaptics_ts_data *ts)
 		ret = i2c_syn_read(ts->client,
 			get_address_base(ts, ts->finger_func_idx, DATA_BASE), buf, sizeof(buf));
 		ret = i2c_syn_read(ts->client,
-			get_address_base(ts, 0x54, DATA_BASE) + 8, &noise_state, 1);
-		if (noise_state == 2) {
-			ret = i2c_syn_read(ts->client,
-				get_address_base(ts, 0x54, DATA_BASE) + 4, noise_index, sizeof(noise_index));
-			ts->debug_log_level |= BIT(17);
-		} else {
-			if (!ts->enable_noise_log)
-				ts->debug_log_level &= ~BIT(17);
-		}
+			get_address_base(ts, 0x54, DATA_BASE) + 4, noise_index, sizeof(noise_index));
+		temp_im = (noise_index[1] <<8) | noise_index[0];
+		temp_cidim = (noise_index[6] <<8) | noise_index[5];
 	}
 	if (ret < 0) {
 		i2c_syn_error_handler(ts, ts->i2c_err_handler_en, "r:1", __func__);
@@ -2293,15 +2289,17 @@ static void synaptics_ts_finger_func(struct synaptics_ts_data *ts)
 						finger_data[i][0] = ts->layout[1];
 					if(ts->width_factor && ts->height_factor){
 						printk(KERN_INFO
-							"[TP] Screen:F[%02d]:Up, X=%d, Y=%d, W=%d, Z=%d\n",
+							"[TP] Screen:F[%02d]:Up, X=%d, Y=%d, W=%d, Z=%d, IM:%d, CIDIM:%d, Freq:%d, NS:%d\n",
 							i+1, (x_pos[i]*ts->width_factor)>>SHIFT_BITS,
 							(y_pos[i]*ts->height_factor)>>SHIFT_BITS,
-							finger_data[i][2], finger_data[i][3]);
+							finger_data[i][2], finger_data[i][3],
+							temp_im, temp_cidim, noise_index[9], noise_index[4]);
 					} else {
 						printk(KERN_INFO
-							"[TP] Raw:F[%02d]:Up, X=%d, Y=%d, W=%d, Z=%d\n",
+							"[TP] Raw:F[%02d]:Up, X=%d, Y=%d, W=%d, Z=%d, IM:%d, CIDIM:%d, Freq:%d, NS:%d\n",
 							i+1, x_pos[i], y_pos[i],
-							finger_data[i][2], finger_data[i][3]);
+							finger_data[i][2], finger_data[i][3],
+							temp_im, temp_cidim, noise_index[9], noise_index[4]);
 					}
 				}
 				base += 5;
@@ -2438,7 +2436,6 @@ static void synaptics_ts_finger_func(struct synaptics_ts_data *ts)
 					if ((finger_pressed & BIT(i)) == BIT(i)) {
 						if (ts->block_touch_event == 0) {
 							if (ts->htc_event == SYN_AND_REPORT_TYPE_A) {
-
 								if (ts->support_htc_event) {
 									input_report_abs(ts->input_dev, ABS_MT_AMPLITUDE,
 										finger_data[i][3] << 16 | finger_data[i][2]);
@@ -2495,15 +2492,17 @@ static void synaptics_ts_finger_func(struct synaptics_ts_data *ts)
 						if ((finger_press_changed & BIT(i)) && ts->debug_log_level & BIT(3)) {
 							if(ts->width_factor && ts->height_factor){
 								printk(KERN_INFO
-									"[TP] Screen:F[%02d]:Down, X=%d, Y=%d, W=%d, Z=%d\n",
+									"[TP] Screen:F[%02d]:Down, X=%d, Y=%d, W=%d, Z=%d, IM:%d, CIDIM:%d, Freq:%d, NS:%d\n",
 									i+1, (finger_data[i][0]*ts->width_factor)>>SHIFT_BITS,
 									(finger_data[i][1]*ts->height_factor)>>SHIFT_BITS,
-									finger_data[i][2], finger_data[i][3]);
+									finger_data[i][2], finger_data[i][3],
+									temp_im, temp_cidim, noise_index[9], noise_index[4]);
 							} else {
 								printk(KERN_INFO
-									"[TP] Raw:F[%02d]:Down, X=%d, Y=%d, W=%d, Z=%d\n",
+									"[TP] Raw:F[%02d]:Down, X=%d, Y=%d, W=%d, Z=%d, IM:%d, CIDIM:%d, Freq:%d, NS:%d\n",
 									i+1, finger_data[i][0], finger_data[i][1],
-									finger_data[i][2], finger_data[i][3]);
+									finger_data[i][2], finger_data[i][3],
+									temp_im, temp_cidim, noise_index[9], noise_index[4]);
 							}
 							if ((ts->block_touch_time_near | ts->block_touch_time_far) && ts->block_touch_event)
 								printk(KERN_INFO "[TP] Block This Event!!\n");
@@ -3483,6 +3482,7 @@ static int syn_probe_init(void *arg)
 	if (rmi_char_dev_register())
 		printk(KERN_INFO "[TP] %s: error register char device", __func__);
 #endif
+
 	printk(KERN_INFO "[TP] synaptics_ts_probe: Start touchscreen %s in %s mode\n", ts->input_dev->name, ts->use_irq ? "interrupt" : "polling");
 
 	return 0;
@@ -3992,5 +3992,6 @@ static void __exit synaptics_ts_exit(void)
 
 module_init(synaptics_ts_init);
 module_exit(synaptics_ts_exit);
+
 MODULE_DESCRIPTION("Synaptics Touchscreen Driver");
 MODULE_LICENSE("GPL");
