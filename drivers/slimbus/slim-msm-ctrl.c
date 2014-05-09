@@ -1091,11 +1091,11 @@ static int msm_sat_define_ch(struct msm_slim_sat *sat, u8 *buf, u8 len, u8 mc)
 		}
 		prop.dataf = (enum slim_ch_dataf)((buf[3] & 0xE0) >> 5);
 		prop.auxf = (enum slim_ch_auxf)((buf[4] & 0xC0) >> 5);
-		prop.baser = SLIM_RATE_4000HZ;
+		prop.baser = SLIM_RATE_44100HZ;
 		if (prrate & 0x8)
-			prop.baser = SLIM_RATE_11025HZ;
+			prop.baser = SLIM_RATE_48000HZ;
 		else
-			prop.baser = SLIM_RATE_4000HZ;
+			prop.baser = SLIM_RATE_44100HZ;
 		prop.prot = (enum slim_ch_proto)(buf[5] & 0x0F);
 		prop.sampleszbits = (buf[4] & 0x1F)*SLIM_CL_PER_SL;
 		exp = (u32)((buf[5] & 0xF0) >> 4);
