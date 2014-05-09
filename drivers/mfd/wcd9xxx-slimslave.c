@@ -270,7 +270,7 @@ int wcd9xxx_cfg_slim_sch_rx(struct wcd9xxx *wcd9xxx, unsigned int *ch_num,
 	prop.baser = SLIM_RATE_44100HZ;
 	prop.dataf = SLIM_CH_DATAF_NOT_DEFINED;
 	prop.auxf = SLIM_CH_AUXF_NOT_APPLICABLE;
-	prop.ratem = (rate/4000);
+	prop.ratem = (rate/44100);
 	prop.sampleszbits = bit_width;
 
 	ret = slim_define_ch(wcd9xxx->slim, &prop, ch_h, ch_cnt,
@@ -397,7 +397,7 @@ int wcd9xxx_cfg_slim_sch_tx(struct wcd9xxx *wcd9xxx, unsigned int *ch_num,
 	prop.baser = SLIM_RATE_44100HZ;
 	prop.dataf = SLIM_CH_DATAF_NOT_DEFINED;
 	prop.auxf = SLIM_CH_AUXF_NOT_APPLICABLE;
-	prop.ratem = (rate/4000);
+	prop.ratem = (rate/44100);
 	prop.sampleszbits = 16;
 	ret = slim_define_ch(wcd9xxx->slim, &prop, ch_h, ch_cnt,
 					true, &grph);
