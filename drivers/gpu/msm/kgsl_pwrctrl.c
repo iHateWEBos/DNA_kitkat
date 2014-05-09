@@ -36,7 +36,6 @@
 
 extern void set_gpu_clk(unsigned int);
 
-unsigned long internal_max = 450000000;
 int graphics_boost = 0;
 
 struct clk_pair {
