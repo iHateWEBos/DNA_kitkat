@@ -1232,15 +1232,15 @@ static u32 slim_calc_prrate(struct slim_controller *ctrl, struct slim_ch *prop)
 	if (prop->prot >= SLIM_PUSH)
 		return 0;
 	if (prop->baser == SLIM_RATE_1HZ) {
-		rate = prop->ratem / 44100;
+		rate = prop->ratem / 4000;
 		rate4k = rate;
-		if (rate * 44100 == prop->ratem)
-			ratefam = SLIM_RATE_44100HZ;
+		if (rate * 4000 == prop->ratem)
+			ratefam = SLIM_RATE_4000HZ;
 		else {
-			rate = prop->ratem / 48000;
+			rate = prop->ratem / 11025;
 			rate11k = rate;
-			if (rate * 48000 == prop->ratem)
-				ratefam = SLIM_RATE_48000HZ;
+			if (rate * 11025 == prop->ratem)
+				ratefam = SLIM_RATE_11025HZ;
 			else
 				ratefam = SLIM_RATE_1HZ;
 		}
@@ -1250,12 +1250,12 @@ static u32 slim_calc_prrate(struct slim_controller *ctrl, struct slim_ch *prop)
 	}
 	if (ratefam == SLIM_RATE_1HZ) {
 		exact = false;
-		if ((rate4k + 1) * 44100 < (rate11k + 1) * 48000) {
+		if ((rate4k + 1) * 4000 < (rate11k + 1) * 11025) {
 			rate = rate4k + 1;
-			ratefam = SLIM_RATE_44100HZ;
+			ratefam = SLIM_RATE_4000HZ;
 		} else {
 			rate = rate11k + 1;
-			ratefam = SLIM_RATE_48000HZ;
+			ratefam = SLIM_RATE_11025HZ;
 		}
 	}
 	
@@ -1271,7 +1271,7 @@ static u32 slim_calc_prrate(struct slim_controller *ctrl, struct slim_ch *prop)
 		} else
 			done = true;
 	}
-	if (ratefam == SLIM_RATE_44100HZ) {
+	if (ratefam == SLIM_RATE_4000HZ) {
 		if (rate == 1)
 			pr = 0x10;
 		else {
@@ -1305,19 +1305,19 @@ static int slim_nextdefine_ch(struct slim_device *sb, u8 chan)
 
 	slc->prrate = slim_calc_prrate(ctrl, prop);
 	dev_dbg(&ctrl->dev, "ch:%d, chan PR rate:%x\n", chan, slc->prrate);
-	if (prop->baser == SLIM_RATE_44100HZ)
-		chrate = 44100 * prop->ratem;
-	else if (prop->baser == SLIM_RATE_48000HZ)
-		chrate = 48000 * prop->ratem;
+	if (prop->baser == SLIM_RATE_4000HZ)
+		chrate = 4000 * prop->ratem;
+	else if (prop->baser == SLIM_RATE_11025HZ)
+		chrate = 11025 * prop->ratem;
 	else
 		chrate = prop->ratem;
 	
 	if (chrate > 3600000)
 		return -EDQUOT;
-	if (prop->baser == SLIM_RATE_44100HZ &&
-			ctrl->a_framer->superfreq == 44100)
+	if (prop->baser == SLIM_RATE_4000HZ &&
+			ctrl->a_framer->superfreq == 4000)
 		coeff = prop->ratem;
-	else if (prop->baser == SLIM_RATE_48000HZ &&
+	else if (prop->baser == SLIM_RATE_11025HZ &&
 			ctrl->a_framer->superfreq == 3675)
 		coeff = 3 * prop->ratem;
 	else {

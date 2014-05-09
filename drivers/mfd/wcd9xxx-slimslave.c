@@ -267,7 +267,7 @@ int wcd9xxx_cfg_slim_sch_rx(struct wcd9xxx *wcd9xxx, unsigned int *ch_num,
 
 	
 	prop.prot = SLIM_AUTO_ISO;
-	prop.baser = SLIM_RATE_44100HZ;
+	prop.baser = SLIM_RATE_4000HZ;
 	prop.dataf = SLIM_CH_DATAF_NOT_DEFINED;
 	prop.auxf = SLIM_CH_AUXF_NOT_APPLICABLE;
 	prop.ratem = (rate/4000);
@@ -394,7 +394,7 @@ int wcd9xxx_cfg_slim_sch_tx(struct wcd9xxx *wcd9xxx, unsigned int *ch_num,
 
 	
 	prop.prot = SLIM_AUTO_ISO;
-	prop.baser = SLIM_RATE_44100HZ;
+	prop.baser = SLIM_RATE_4000HZ;
 	prop.dataf = SLIM_CH_DATAF_NOT_DEFINED;
 	prop.auxf = SLIM_CH_AUXF_NOT_APPLICABLE;
 	prop.ratem = (rate/4000);
