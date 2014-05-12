@@ -4933,8 +4933,7 @@ static void __init monarudo_allocate_memory_regions(void)
 	else
 		pr_err("Failed to reserve space for hardboot page at 0x%X!\n", start);
 #endif
-
-	m7_allocate_fb_region();
+	monarudo_allocate_fb_region();
 }
 
 static void __init monarudo_cdp_init(void)
