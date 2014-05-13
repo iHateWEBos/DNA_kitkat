@@ -3227,4 +3227,3 @@ config LCD_KCAL
           Enable MSM generic LCDC temperature Calibration.
 
 endif
-
