@@ -197,11 +197,7 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH		:= arm
-<<<<<<< HEAD
-CROSS_COMPILE	:= $(CCACHE) /home/hate/arm-cortex_a15/bin/arm-cortex_a15-linux-gnueabihf-
-=======
 CROSS_COMPILE	:= $(CCACHE) /home/hate/arm-cortex_a15-4.8/bin/arm-cortex_a15-linux-gnueabihf-
->>>>>>> 3741ff9e369e7a8a21e2555e599edf4fe9f9d390
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
