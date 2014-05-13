@@ -1903,6 +1903,14 @@ config MSM_DALRPC_TEST
 	help
 	  Exercises DAL RPC calls to QDSP6.
 
+config CMDLINE_OPTIONS
+	bool "Enable cmdline khz/gov/s2w command parsing"
+	default y
+	help
+	  This enables the parsing of maxkhz=<VALUEinKHZ>,
+	  minkhz=<VALUEinKHZ>, governor=<GOVERNOR.NAME>
+	  commands from the kernels cmdline.
+
 if CPU_FREQ_MSM
 
 config MSM_CPU_FREQ_SET_MIN_MAX
