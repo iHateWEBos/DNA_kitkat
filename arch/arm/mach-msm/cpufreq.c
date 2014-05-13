@@ -71,7 +71,128 @@ struct cpu_freq {
 static DEFINE_PER_CPU(struct cpu_freq, cpu_freq_info);
 
 static int override_cpu;
+#ifdef CONFIG_CMDLINE_OPTIONS
+/*
+ * start cmdline_khz
+ */
 
+/* to be safe, fill vars with defaults */
+
+
+uint32_t cmdline_maxkhz = 1512000, cmdline_minkhz = 384000;
+
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
+char cmdline_gov[16] = "conservative";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE
+char cmdline_gov[16] = "userspace";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_POWERSAVE
+char cmdline_gov[16] = "powersave";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_PRESERVATIVE
+char cmdline_gov[16] = "preservative";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND
+char cmdline_gov[16] = "ondemand";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
+char cmdline_gov[16] = "performance";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
+char cmdline_gov[16] = "intellidemand";
+#endif
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE
+char cmdline_gov[16] = "intelliactive";
+#endif
+
+bool cmdline_scroff = false;
+
+/* only override the governor 2 times, when
+ * initially bringing up cpufreq on the cpus */
+int cmdline_gov_cnt = CONFIG_NR_CPUS;
+
+static int __init cpufreq_read_maxkhz_cmdline(char *maxkhz)
+{
+	uint32_t check;
+	unsigned long ui_khz;
+	int err;
+
+	err = strict_strtoul(maxkhz, 0, &ui_khz);
+	if (err) {
+		cmdline_maxkhz = 1512000;
+		printk(KERN_INFO "[cmdline_khz_max]: ERROR while converting! using default value!");
+		printk(KERN_INFO "[cmdline_khz_max]: maxkhz='%i'\n", cmdline_maxkhz);
+		return 1;
+	}
+
+	check = acpu_check_khz_value(ui_khz);
+
+	if (check == 1) {
+		cmdline_maxkhz = ui_khz;
+		printk(KERN_INFO "[cmdline_khz_max]: maxkhz='%u'\n", cmdline_maxkhz);
+	}
+	if (check == 0) {
+		cmdline_maxkhz = 1512000;
+		printk(KERN_INFO "[cmdline_khz_max]: ERROR! using default value!");
+		printk(KERN_INFO "[cmdline_khz_max]: maxkhz='%u'\n", cmdline_maxkhz);
+	}
+	if (check > 1) {
+		cmdline_maxkhz = check;
+		printk(KERN_INFO "[cmdline_khz_max]: AUTOCORRECT! Could not find entered value in the acpu table!");
+		printk(KERN_INFO "[cmdline_khz_max]: maxkhz='%u'\n", cmdline_maxkhz);
+	}
+        return 1;
+}
+__setup("maxkhz=", cpufreq_read_maxkhz_cmdline);
+
+static int __init cpufreq_read_minkhz_cmdline(char *minkhz)
+{
+	uint32_t check;
+	unsigned long ui_khz;
+	int err;
+
+	err = strict_strtoul(minkhz, 0, &ui_khz);
+	if (err) {
+		cmdline_minkhz = 384000;
+		printk(KERN_INFO "[cmdline_khz_min]: ERROR while converting! using default value!");
+		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%i'\n", cmdline_minkhz);
+		return 1;
+	}
+
+	check = acpu_check_khz_value(ui_khz);
+
+	if (check == 1) {
+		cmdline_minkhz = ui_khz;
+		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%u'\n", cmdline_minkhz);
+	}
+	if (check == 0) {
+		cmdline_minkhz = 384000;
+		printk(KERN_INFO "[cmdline_khz_min]: ERROR! using default value!");
+		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%u'\n", cmdline_minkhz);
+	}
+	if (check > 1) {
+		cmdline_minkhz = check;
+		printk(KERN_INFO "[cmdline_khz_min]: AUTOCORRECT! Could not find entered value in the acpu table!");
+		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%u'\n", cmdline_minkhz);
+	}
+        return 1;
+}
+__setup("minkhz=", cpufreq_read_minkhz_cmdline);
+
+static int __init cpufreq_read_gov_cmdline(char *gov)
+{
+	if (gov) {
+		strcpy(cmdline_gov, gov);
+		printk(KERN_INFO "[cmdline_gov]: Governor will be set to '%s'", cmdline_gov);
+	} else {
+		printk(KERN_INFO "[cmdline_gov]: No input found.");
+	}
+	return 1;
+}
+__setup("gov=", cpufreq_read_gov_cmdline);
+/* end cmdline_khz */
+#endif
 static int set_cpu_freq(struct cpufreq_policy *policy, unsigned int new_freq)
 {
 	int ret = 0;
@@ -283,6 +404,7 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 {
 	int cur_freq;
 	int index;
+	int ret = 0;
 	struct cpufreq_frequency_table *table;
 #ifdef CONFIG_SMP
 	struct cpufreq_work_struct *cpu_work = NULL;
@@ -336,18 +458,12 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 		return -EINVAL;
 	}
 
-	if (cur_freq != table[index].frequency) {
-		int ret = 0;
-		ret = acpuclk_set_rate(policy->cpu, table[index].frequency,
-				SETRATE_CPUFREQ);
-		if (ret)
-			return ret;
-		pr_info("cpufreq: cpu%d init at %d switching to %d\n",
-				policy->cpu, cur_freq, table[index].frequency);
-		cur_freq = table[index].frequency;
-	}
-
-	policy->cur = cur_freq;
+	ret = set_cpu_freq(policy, table[index].frequency);
+	if (ret)
+	  return ret;
+	pr_debug("cpufreq: cpu%d init at %d switching to %d\n",
+	    policy->cpu, cur_freq, table[index].frequency);
+	policy->cur = table[index].frequency;
 
 	policy->cpuinfo.transition_latency =
 		acpuclk_get_switch_time() * NSEC_PER_USEC;
@@ -356,7 +472,13 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	INIT_WORK(&cpu_work->work, set_cpu_work);
 	init_completion(&cpu_work->complete);
 #endif
-
+#ifdef CONFIG_CMDLINE_OPTIONS
+	policy->max = cmdline_maxkhz;
+	policy->min = cmdline_minkhz;
+#else 
+	policy->max = 1512000;
+	policy->min = 384000; 
+#endif
 	return 0;
 }
 
