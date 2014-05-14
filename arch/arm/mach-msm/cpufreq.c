@@ -475,9 +475,6 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 #ifdef CONFIG_CMDLINE_OPTIONS
 	policy->max = cmdline_maxkhz;
 	policy->min = cmdline_minkhz;
-#else 
-	policy->max = 1512000;
-	policy->min = 384000; 
 #endif
 	return 0;
 }

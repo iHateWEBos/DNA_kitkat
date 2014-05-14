@@ -641,10 +641,10 @@ uint32_t __init acpu_check_khz_value(unsigned long khz)
 	struct acpu_level *f;
 
 	if (khz > 1728000)
-		return 1512000;
+		return 1728000;
 
 	if (khz < 162000)
-		return 384000;
+		return 162000;
 
 	for (f = tbl_slow,tbl_nom,tbl_fast,tbl_faster; f->speed.khz != 0; f++) {
 		if (khz < 162000) {
