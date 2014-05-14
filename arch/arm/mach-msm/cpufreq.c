@@ -79,7 +79,7 @@ static int override_cpu;
 /* to be safe, fill vars with defaults */
 
 
-uint32_t cmdline_maxkhz = 1512000, cmdline_minkhz = 384000;
+uint32_t cmdline_maxkhz = 1512000, cmdline_minkhz = 162000;
 
 #ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 char cmdline_gov[16] = "conservative";
@@ -154,7 +154,7 @@ static int __init cpufreq_read_minkhz_cmdline(char *minkhz)
 
 	err = strict_strtoul(minkhz, 0, &ui_khz);
 	if (err) {
-		cmdline_minkhz = 384000;
+		cmdline_minkhz = 162000;
 		printk(KERN_INFO "[cmdline_khz_min]: ERROR while converting! using default value!");
 		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%i'\n", cmdline_minkhz);
 		return 1;
@@ -167,7 +167,7 @@ static int __init cpufreq_read_minkhz_cmdline(char *minkhz)
 		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%u'\n", cmdline_minkhz);
 	}
 	if (check == 0) {
-		cmdline_minkhz = 384000;
+		cmdline_minkhz = 162000;
 		printk(KERN_INFO "[cmdline_khz_min]: ERROR! using default value!");
 		printk(KERN_INFO "[cmdline_khz_min]: minkhz='%u'\n", cmdline_minkhz);
 	}
