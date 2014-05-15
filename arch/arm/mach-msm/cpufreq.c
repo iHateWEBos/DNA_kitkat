@@ -106,8 +106,6 @@ char cmdline_gov[16] = "intellidemand";
 char cmdline_gov[16] = "intelliactive";
 #endif
 
-bool cmdline_scroff = false;
-
 /* only override the governor 2 times, when
  * initially bringing up cpufreq on the cpus */
 int cmdline_gov_cnt = CONFIG_NR_CPUS;
@@ -441,6 +439,11 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	policy->max = CONFIG_MSM_CPU_FREQ_MAX;
 #endif
 
+#ifdef CONFIG_CMDLINE_OPTIONS
+	policy->max = cmdline_maxkhz;
+	policy->min = cmdline_minkhz;
+#endif
+
 #ifdef CONFIG_ARCH_APQ8064
 	if( board_mfg_mode() == 5) {
 		policy->cpuinfo.max_freq = 918000;
@@ -472,10 +475,7 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	INIT_WORK(&cpu_work->work, set_cpu_work);
 	init_completion(&cpu_work->complete);
 #endif
-#ifdef CONFIG_CMDLINE_OPTIONS
-	policy->max = cmdline_maxkhz;
-	policy->min = cmdline_minkhz;
-#endif
+
 	return 0;
 }
 
