@@ -34,7 +34,7 @@
 
 static struct cpufreq_driver *cpufreq_driver;
 
-static bool sys_locked = false;
+static int sys_locked = 0;
 
 static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
 #ifdef CONFIG_HOTPLUG_CPU
@@ -656,6 +656,24 @@ static struct attribute_group vddtbl_attr_group = {
 	.name = "vdd_table",
 };
 #endif	/* CONFIG_CPU_VOLTAGE_TABLE */
+
+/* Read cmdline for sys_locked */
+static int __init read_sys_locked_cmdline(char *locked)
+{
+	if (strcmp(locked, "1") == 0) {
+		pr_info("[cmdline_sys_locked]: Enabled. | locked='%u'\n", sys_locked);
+                sys_locked = 1;
+	} else if (strcmp(locked, "0") == 0) {
+		pr_info("[cmdline_sys_locked]: Disabled. | locked='%u'\n", sys_locked);
+		sys_locked = 0;
+	} else {
+		pr_info("[cmdline_sys_locked]: No valid input found. Going with default: | locked='%u'\n", sys_locked);
+	}
+	return 1;
+}
+
+__setup("locked=", read_sys_locked_cmdline);
+
 
 static ssize_t show_locked(struct kobject *a, struct attribute *b, char *buf)
 {
