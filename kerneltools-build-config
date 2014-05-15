@@ -7,7 +7,7 @@ BOOT_PARTITION="/dev/block/mmcblk0p19"
 DEFCONFIG=dlx_defconfig
 N_CORES=4
 
-VERSION=test_build
+VERSION=6.4-torrented
 
 BANNER=`cat <<EOF
 ui_print("**********************************************");
