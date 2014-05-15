@@ -36,16 +36,16 @@ static int old_up_threshold;
 
 #define DEF_SAMPLING_RATE				(50000)
 #define DEF_FREQUENCY_DOWN_DIFFERENTIAL		(10)
-#define DEF_FREQUENCY_UP_THRESHOLD		(80)
+#define DEF_FREQUENCY_UP_THRESHOLD		(70)
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(100000)
 #define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
-#define MICRO_FREQUENCY_UP_THRESHOLD		(95)
+#define MICRO_FREQUENCY_UP_THRESHOLD		(85)
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
 #define MIN_FREQUENCY_DOWN_DIFFERENTIAL		(1)
-#define DBS_INPUT_EVENT_MIN_FREQ		(1134000)
+#define DBS_INPUT_EVENT_MIN_FREQ		(918000)
 #define DEF_UI_DYNAMIC_SAMPLING_RATE		(30000)
 #define DBS_UI_SAMPLING_MIN_TIMEOUT		(30)
 #define DBS_UI_SAMPLING_MAX_TIMEOUT		(1000)
@@ -58,7 +58,7 @@ static unsigned int min_sampling_rate;
 static unsigned int skip_ondemand = 0;
 
 #define LATENCY_MULTIPLIER			(1000)
-#define MIN_LATENCY_MULTIPLIER			(100)
+#define MIN_LATENCY_MULTIPLIER			(20)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)
 
 #define POWERSAVE_BIAS_MAXLEVEL			(1000)
@@ -116,7 +116,7 @@ extern int has_boost_cpu_func;
 #endif
 
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_MULTI_PHASE
-#define TABLE_SIZE			5
+#define TABLE_SIZE			14
 #define MAX(x,y)			(x > y ? x : y)
 #define MIN(x,y)			(x < y ? x : y)
 #define FREQ_NEED_BURST(x)	(x < 600000 ? 1 : 0)
