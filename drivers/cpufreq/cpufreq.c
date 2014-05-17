@@ -427,8 +427,8 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	char	str_governor[16];
 	struct cpufreq_policy new_policy;
 
-	if (sys_locked)
-		return -EINVAL;
+	//if (sys_locked)
+	//	return -EINVAL;
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
