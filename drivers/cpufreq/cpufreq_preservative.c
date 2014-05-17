@@ -25,7 +25,7 @@
 
 #define TRANSITION_LATENCY_LIMIT	(10 * 1000 * 1000)
 #define SAMPLE_RATE			(40009)
-#define OPTIMAL_POSITION		(5)
+#define OPTIMAL_POSITION		(6)
 #define TABLE_SIZE			(14)
 #define HYSTERESIS			(9)
 #define UP_THRESH			(100)
