@@ -304,6 +304,7 @@ enum slim_ch_rate {
 	SLIM_RATE_1HZ,
 	SLIM_RATE_44100HZ,
 	SLIM_RATE_48000HZ
+};
 
 /*
  * enum slim_ch_coeff: Coefficient of a channel used internally by framework.
