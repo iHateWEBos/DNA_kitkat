@@ -657,6 +657,7 @@ static struct attribute_group vddtbl_attr_group = {
 };
 #endif	/* CONFIG_CPU_VOLTAGE_TABLE */
 
+#ifdef CONFIG_CMDLINE_OPTIONS 
 /* Read cmdline for sys_locked */
 static int __init read_sys_locked_cmdline(char *locked)
 {
@@ -673,7 +674,7 @@ static int __init read_sys_locked_cmdline(char *locked)
 }
 
 __setup("locked=", read_sys_locked_cmdline);
-
+#endif /* CONFIG_CMDLINE_OPTIONS */
 
 static ssize_t show_locked(struct kobject *a, struct attribute *b, char *buf)
 {
