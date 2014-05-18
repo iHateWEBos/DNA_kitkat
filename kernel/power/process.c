@@ -15,7 +15,7 @@
 #include "power.h"
 #include <mach/msm_watchdog.h>
 
-#define TIMEOUT	(20 * HZ)
+#define TIMEOUT	(10 * HZ)		/* Timeout for stopping processes */
 
 static int try_to_freeze_tasks(bool user_only)
 {
