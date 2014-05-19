@@ -1946,7 +1946,7 @@ config MSM_CPU_FREQ_DEFAULT_MIN
 	depends on MSM_CPU_FREQ_SET_DEFAULT_MIN_MAX
 
 endif # CPU_FREQ_MSM
-
+	  
 config CPU_VOLTAGE_TABLE
 	bool "Enable CPU Voltage Table via sysfs for adjustements"
 	default n
