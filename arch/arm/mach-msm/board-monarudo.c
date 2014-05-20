@@ -4980,8 +4980,8 @@ static void __init monarudo_cdp_init(void)
         if(!cpu_is_krait_v1())
                 id_set_two_phase_freq(1134000);
 #endif
-	set_input_event_min_freq_by_cpu(1, 1134000);
-	set_input_event_min_freq_by_cpu(2, 1134000);
+	set_input_event_min_freq_by_cpu(1, 918000);
+	set_input_event_min_freq_by_cpu(2, 918000);
 	set_input_event_min_freq_by_cpu(3, 918000);
 	set_input_event_min_freq_by_cpu(4, 918000);
 
