@@ -631,6 +631,12 @@ config TCP_MD5SIG
 
 	  If unsure, say N.
 
+config HTC_LARGE_TCP_INITIAL_BUFFER
+	bool "TCP: initial TCP buffer size 5K:64K"
+	default n
+	help
+	yes means TCP buffer size 5K
+	
 config HTC_NETWORK_DEBUG
 	tristate "HTC_NETWORK_DEBUG"
 	default n

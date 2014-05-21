@@ -164,8 +164,13 @@ void tcp_select_initial_window(int __space, __u32 mss,
 		else
 			*rcv_wnd = min(*rcv_wnd, init_cwnd * mss);
 	}
-
 	
+#ifdef CONFIG_HTC_LARGE_TCP_INITIAL_BUFFER
+
+			*rcv_wnd = 65535;
+#endif
+
+
 	(*window_clamp) = min(65535U << (*rcv_wscale), *window_clamp);
 }
 EXPORT_SYMBOL(tcp_select_initial_window);
