@@ -22,6 +22,11 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 
+#ifdef CONFIG_DEBUG_FS
+#include <linux/debugfs.h>
+#include <linux/uaccess.h>	/* for copy_from_user */
+#endif
+
 #include <asm/cputype.h>
 #include <asm/topology.h>
 
