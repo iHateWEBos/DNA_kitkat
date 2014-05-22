@@ -354,10 +354,10 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   = -munaligned-access -fno-pic -mfpu=neon-vfpv4
+CFLAGS_MODULE   = -munaligned-access -fno-pic -mfpu=neon-vfpv4 -ftree-vectorize -ffast-math
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL   = -munaligned-access -mfpu=neon-vfpv4 -fgcse-lm -fgcse-sm -fsched-spec-load -ffast-math -fsingle-precision-constant
+CFLAGS_KERNEL   = -munaligned-access -mfpu=neon-vfpv4 -ftree-vectorize -ffast-math
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
