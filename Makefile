@@ -196,6 +196,7 @@ CCACHE=ccache
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
+ARCH		:= arm
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
