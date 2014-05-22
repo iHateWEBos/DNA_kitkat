@@ -357,7 +357,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   = -munaligned-access -fno-pic -mfpu=neon-vfpv4
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL   = -munaligned-access -mfpu=neon-vfpv4
+CFLAGS_KERNEL   = -munaligned-access -mfpu=neon-vfpv4 -fgcse-lm -fgcse-sm -fsched-spec-load -ffast-math -fsingle-precision-constant
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
