@@ -36,6 +36,12 @@ modules.builtin
 *.orig
 
 #
+# iHate the following
+#
+kerneltools-build-config
+/hate
+
+#
 # Top-level generic files
 #
 /tags

@@ -196,8 +196,6 @@ CCACHE=ccache
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
-ARCH		:= arm
-CROSS_COMPILE	:= $(CCACHE) /home/hate/arm-cortex_a15-4.8/bin/arm-cortex_a15-linux-gnueabihf-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
