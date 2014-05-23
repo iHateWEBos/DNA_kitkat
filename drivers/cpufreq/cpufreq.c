@@ -966,21 +966,6 @@ static int cpufreq_add_dev_interface(unsigned int cpu,
 	memcpy(&new_policy, policy, sizeof(struct cpufreq_policy));
 	
 	policy->governor = NULL;
-#ifdef CONFIG_CMDLINE_OPTIONS
-	/* cmdline_khz governor */
-	fgov = __find_governor(cmdline_gov);
-	if ((*cmdline_gov) && (strcmp(cmdline_gov, "") != 0) &&
-	   ((strcmp(cmdline_gov, fgov->name)) == 0) && (cmdline_gov_cnt != 0)) {
-		if (cpufreq_parse_governor(cmdline_gov, &new_policy.policy,
-							&new_policy.governor))
-		return -EINVAL;
-		printk(KERN_INFO "[cmdline_gov]: Governor set to '%s' on CPU%i", cmdline_gov, cpu);
-		cmdline_gov_cnt--;
-	} else {
-		if (cmdline_gov_cnt != 0)
-			printk(KERN_INFO "[cmdline_gov]: ERROR! Could not set governor '%s' on CPU%i", cmdline_gov, cpu);
-	}
-#endif
 	
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.policy = policy->policy;

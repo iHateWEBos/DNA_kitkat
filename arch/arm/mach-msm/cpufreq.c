@@ -81,35 +81,6 @@ static int override_cpu;
 
 uint32_t cmdline_maxkhz = 1512000, cmdline_minkhz = 162000;
 
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
-char cmdline_gov[16] = "conservative";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE
-char cmdline_gov[16] = "userspace";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_POWERSAVE
-char cmdline_gov[16] = "powersave";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_PRESERVATIVE
-char cmdline_gov[16] = "preservative";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND
-char cmdline_gov[16] = "ondemand";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
-char cmdline_gov[16] = "performance";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND
-char cmdline_gov[16] = "intellidemand";
-#endif
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE
-char cmdline_gov[16] = "intelliactive";
-#endif
-
-/* only override the governor 2 times, when
- * initially bringing up cpufreq on the cpus */
-int cmdline_gov_cnt = CONFIG_NR_CPUS;
-
 static int __init cpufreq_read_maxkhz_cmdline(char *maxkhz)
 {
 	uint32_t check;
@@ -177,20 +148,9 @@ static int __init cpufreq_read_minkhz_cmdline(char *minkhz)
         return 1;
 }
 __setup("minkhz=", cpufreq_read_minkhz_cmdline);
-
-static int __init cpufreq_read_gov_cmdline(char *gov)
-{
-	if (gov) {
-		strcpy(cmdline_gov, gov);
-		printk(KERN_INFO "[cmdline_gov]: Governor will be set to '%s'", cmdline_gov);
-	} else {
-		printk(KERN_INFO "[cmdline_gov]: No input found.");
-	}
-	return 1;
-}
-__setup("gov=", cpufreq_read_gov_cmdline);
 /* end cmdline_khz */
 #endif
+
 static int set_cpu_freq(struct cpufreq_policy *policy, unsigned int new_freq)
 {
 	int ret = 0;

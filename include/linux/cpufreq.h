@@ -26,12 +26,9 @@
 #ifdef CONFIG_CMDLINE_OPTIONS
 /* cmdline_khz variables */
 extern uint32_t cmdline_maxkhz, cmdline_minkhz;
-extern char cmdline_gov[16];
-extern int cmdline_gov_cnt;
 
 /* check_khz function for cmdline khz parameters */
 extern uint32_t acpu_check_khz_value(unsigned long khz);
-
 #endif
 
 
@@ -337,9 +334,6 @@ extern struct cpufreq_governor cpufreq_gov_interactive;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIDEMAND)
 extern struct cpufreq_governor cpufreq_gov_intellidemand;
 #define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_intellidemand)
-#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE)
-extern struct cpufreq_governor cpufreq_gov_intelliactive;
-#define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_intelliactive)
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_PRESERVATIVE)
 extern struct cpufreq_governor cpufreq_gov_preservative;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_preservative)
