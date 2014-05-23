@@ -113,7 +113,7 @@ extern int has_boost_cpu_func;
 #endif
 
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_MULTI_PHASE
-#define TABLE_SIZE			10
+#define TABLE_SIZE			9		/* multi_phase boost freq = 1.5Ghz */
 #define MAX(x,y)			(x > y ? x : y)
 #define MIN(x,y)			(x < y ? x : y)
 #define FREQ_NEED_BURST(x)	(x < 600000 ? 1 : 0)
