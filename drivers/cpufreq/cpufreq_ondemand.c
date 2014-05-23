@@ -1651,13 +1651,13 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		this_dbs_info->cur_policy = NULL;
 		if (!cpu)
 			input_unregister_handler(&dbs_input_handler);
+		mutex_unlock(&dbs_mutex);
 		if (!dbs_enable) {
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_MULTI_PHASE
 			dbs_deinit_freq_map_table();
 #endif
 			sysfs_remove_group(cpufreq_global_kobject,
 					   &dbs_attr_group);
-			mutex_unlock(&dbs_mutex);
 		}
 		trace_cpufreq_interactive_target (cpu, 0, 0, 0);
 		break;
