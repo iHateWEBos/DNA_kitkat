@@ -35,10 +35,6 @@
 #ifdef CONFIG_PERFLOCK
 #include <mach/perflock.h>
 #endif
-
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN_MAX
-static DEFINE_PER_CPU(bool, set_default_min_max);
-#endif
  
 #ifdef CONFIG_SMP
 struct cpufreq_work_struct {
@@ -368,10 +364,6 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	struct cpufreq_work_struct *cpu_work = NULL;
 #endif
 
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN_MAX
-	bool *have_set_default_min_max = &per_cpu(set_default_min_max, policy->cpu);
-#endif
-
 	table = cpufreq_frequency_get_table(policy->cpu);
 	if (table == NULL)
 		return -ENODEV;
@@ -388,15 +380,6 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 		policy->cpuinfo.max_freq = cmdline_maxkhz;
 #endif
 	}
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN_MAX
-	if (! *have_set_default_min_max) {
-		*have_set_default_min_max = true;
-		pr_info("cpufreq: setting default min to %d", CONFIG_MSM_CPU_FREQ_DEFAULT_MIN);
-		policy->min = CONFIG_MSM_CPU_FREQ_DEFAULT_MIN;
-		pr_info("cpufreq: setting default max to %d", CONFIG_MSM_CPU_FREQ_DEFAULT_MAX);
-		policy->max = CONFIG_MSM_CPU_FREQ_DEFAULT_MAX;
-	}
-#endif
 
 #ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
 		policy->min = CONFIG_MSM_CPU_FREQ_MIN;

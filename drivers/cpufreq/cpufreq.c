@@ -912,9 +912,6 @@ static int cpufreq_add_dev_interface(unsigned int cpu,
 				     struct device *dev)
 {
 	struct cpufreq_policy new_policy;
-#ifdef CONFIG_CMDLINE_OPTIONS
-	struct cpufreq_governor *fgov;
-#endif
 	struct freq_attr **drv_attr;
 	unsigned long flags;
 	int ret = 0;
