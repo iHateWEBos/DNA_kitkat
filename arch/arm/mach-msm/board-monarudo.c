@@ -227,9 +227,6 @@ enum {
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
 int set_two_phase_freq(int cpufreq);
 #endif
-#ifdef CONFIG_CPU_FREQ_GOV_INTELLIDEMAND 
-int id_set_two_phase_freq(int cpufreq);
-#endif
 
 int set_input_event_min_freq_by_cpu(int cpu_nr, int cpufreq);
 
@@ -4975,10 +4972,6 @@ static void __init monarudo_cdp_init(void)
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
 	if(!cpu_is_krait_v1())
 		set_two_phase_freq(1134000);
-#endif
-#ifdef CONFIG_CPU_FREQ_GOV_INTELLIDEMAND
-        if(!cpu_is_krait_v1())
-                id_set_two_phase_freq(1134000);
 #endif
 	set_input_event_min_freq_by_cpu(1, 918000);
 	set_input_event_min_freq_by_cpu(2, 918000);
