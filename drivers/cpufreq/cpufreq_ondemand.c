@@ -37,11 +37,11 @@ static int g_count = 0;
 
 #define DEF_SAMPLING_RATE			(30000)
 #define DEF_FREQUENCY_DOWN_DIFFERENTIAL		(10)
-#define DEF_FREQUENCY_UP_THRESHOLD		(90)
+#define DEF_FREQUENCY_UP_THRESHOLD		(80)
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(100000)
 #define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
-#define MICRO_FREQUENCY_UP_THRESHOLD		(95)
+#define MICRO_FREQUENCY_UP_THRESHOLD		(85)
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
@@ -124,7 +124,7 @@ extern int has_boost_cpu_func;
 static	struct cpufreq_frequency_table *tbl = NULL;
 static unsigned int *tblmap[TABLE_SIZE] __read_mostly;
 static unsigned int tbl_select[4];
-static unsigned int up_threshold_level[2] __read_mostly = {95, 85};
+static unsigned int up_threshold_level[2] __read_mostly = {90, 80};
 static int input_event_counter = 0;
 struct timer_list freq_mode_timer;
 
@@ -436,7 +436,7 @@ static ssize_t store_input_event_timeout(struct kobject *a, struct attribute *b,
 	return count;
 }
 
-static int two_phase_freq_array[NR_CPUS] = {[0 ... NR_CPUS-1] = 1566000} ;
+static int two_phase_freq_array[NR_CPUS] = {[0 ... NR_CPUS-1] = 1404000} ;
 
 static ssize_t show_two_phase_freq
 (struct kobject *kobj, struct attribute *attr, char *buf)
@@ -473,7 +473,7 @@ static ssize_t store_two_phase_freq(struct kobject *a, struct attribute *b,
 	return count;
 }
 
-static int input_event_min_freq_array[NR_CPUS] = {1134000, 1134000, 1134000, 1134000} ;
+static int input_event_min_freq_array[NR_CPUS] = {918000, 918000, 918000, 918000} ;
 
 static ssize_t show_input_event_min_freq
 (struct kobject *kobj, struct attribute *attr, char *buf)
