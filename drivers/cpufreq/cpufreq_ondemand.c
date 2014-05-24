@@ -41,18 +41,21 @@ static int g_count = 0;
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(100000)
 #define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
-#define MICRO_FREQUENCY_UP_THRESHOLD		(85)
+#define MICRO_FREQUENCY_UP_THRESHOLD		(95)
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
-#define MIN_FREQUENCY_UP_THRESHOLD		(11)
-#define MAX_FREQUENCY_UP_THRESHOLD		(100)
+#define MIN_FREQUENCY_UP_THRESHOLD			(11)
+#define MAX_FREQUENCY_UP_THRESHOLD			(100)
 #define MIN_FREQUENCY_DOWN_DIFFERENTIAL		(1)
-#define UI_DYNAMIC_SAMPLING_RATE		(15000)
+#define UI_DYNAMIC_SAMPLING_RATE			(15000)
 #define INPUT_EVENT_MIN_TIMEOUT			(0)
 #define INPUT_EVENT_MAX_TIMEOUT			(3000)
 #define INPUT_EVENT_TIMEOUT			(1000)
 #define DBS_SWITCH_MODE_TIMEOUT			(1000)
 #define DEF_GBOOST_THRESHOLD     		(49)
 #define MIN_SAMPLING_RATE_RATIO			(2)
+#define TWO_PHASE_FREQUENCY			(1404000)
+#define INPUT_BOOST_MIN_FREQ			(918000)
+#define GBOOST_MIN_FREQ			(1188000)
 
 static unsigned int min_sampling_rate;
 static unsigned int skip_ondemand = 0;
@@ -124,7 +127,7 @@ extern int has_boost_cpu_func;
 static	struct cpufreq_frequency_table *tbl = NULL;
 static unsigned int *tblmap[TABLE_SIZE] __read_mostly;
 static unsigned int tbl_select[4];
-static unsigned int up_threshold_level[2] __read_mostly = {90, 80};
+static unsigned int up_threshold_level[2] __read_mostly = {95, 85};
 static int input_event_counter = 0;
 struct timer_list freq_mode_timer;
 
@@ -436,7 +439,7 @@ static ssize_t store_input_event_timeout(struct kobject *a, struct attribute *b,
 	return count;
 }
 
-static int two_phase_freq_array[NR_CPUS] = {[0 ... NR_CPUS-1] = 1404000} ;
+static int two_phase_freq_array[NR_CPUS] = {[0 ... NR_CPUS-1] = TWO_PHASE_FREQUENCY} ;
 
 static ssize_t show_two_phase_freq
 (struct kobject *kobj, struct attribute *attr, char *buf)
@@ -473,7 +476,7 @@ static ssize_t store_two_phase_freq(struct kobject *a, struct attribute *b,
 	return count;
 }
 
-static int input_event_min_freq_array[NR_CPUS] = {918000, 918000, 918000, 918000} ;
+static int input_event_min_freq_array[NR_CPUS] = {[0 ... NR_CPUS-1] = INPUT_BOOST_MIN_FREQ} ;
 
 static ssize_t show_input_event_min_freq
 (struct kobject *kobj, struct attribute *attr, char *buf)
@@ -1297,7 +1300,7 @@ if (dbs_tuners_ins.gboost) {
 			dbs_tuners_ins.up_threshold = old_up_threshold;
 	}
 	if (g_count > 40) {
-		boost_min_freq(1134000);
+		boost_min_freq(GBOOST_MIN_FREQ);
 	}
 }
 //end
