@@ -55,7 +55,7 @@ static int g_count = 0;
 #define MIN_SAMPLING_RATE_RATIO			(2)
 #define TWO_PHASE_FREQUENCY			(1404000)
 #define INPUT_BOOST_MIN_FREQ			(918000)
-#define GBOOST_MIN_FREQ			(1188000)
+#define GBOOST_MIN_FREQ			(1134000)
 
 static unsigned int min_sampling_rate;
 static unsigned int skip_ondemand = 0;
