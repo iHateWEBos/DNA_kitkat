@@ -41,7 +41,7 @@ static int g_count = 0;
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(100000)
 #define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
-#define MICRO_FREQUENCY_UP_THRESHOLD		(95)
+#define MICRO_FREQUENCY_UP_THRESHOLD		(90)
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD			(11)
 #define MAX_FREQUENCY_UP_THRESHOLD			(100)
@@ -127,7 +127,7 @@ extern int has_boost_cpu_func;
 static	struct cpufreq_frequency_table *tbl = NULL;
 static unsigned int *tblmap[TABLE_SIZE] __read_mostly;
 static unsigned int tbl_select[4];
-static unsigned int up_threshold_level[2] __read_mostly = {95, 85};
+static unsigned int up_threshold_level[2] __read_mostly = {90, 80};
 static int input_event_counter = 0;
 struct timer_list freq_mode_timer;
 
