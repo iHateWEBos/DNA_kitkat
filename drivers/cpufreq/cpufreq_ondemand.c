@@ -53,7 +53,7 @@ static int g_count = 0;
 #define DBS_SWITCH_MODE_TIMEOUT			(1000)
 #define DEF_GBOOST_THRESHOLD     		(49)
 #define MIN_SAMPLING_RATE_RATIO			(2)
-#define TWO_PHASE_FREQUENCY			(1404000)
+#define TWO_PHASE_FREQUENCY			(1350000)
 #define INPUT_BOOST_MIN_FREQ			(918000)
 #define GBOOST_MIN_FREQ			(1134000)
 
