@@ -1035,4 +1035,8 @@ config POCKET_DETECT
         tristate "Pocket_detect for touchscreens"
         default y
 
+config TOUCHSCREEN_SYNAPTICS_GESTURES
+        tristate "Motion Wake Gestures for touchscreens"
+        default y
+
 endif

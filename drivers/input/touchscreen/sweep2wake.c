@@ -32,6 +32,9 @@
 #ifdef CONFIG_POCKET_DETECT
 #include <linux/input/pocket_detect.h>
 #endif
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_GESTURES
+#include <linux/input/motionwakegesture.h>
+#endif
 #ifndef CONFIG_HAS_EARLYSUSPEND
 #include <linux/lcd_notify.h>
 #else
@@ -91,6 +94,13 @@ MODULE_LICENSE("GPLv2");
 #define S2W_X_FINAL             300
 #endif
 
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_GESTURES
+#define GEST_Y_LIMIT            2725
+#define GEST_Y_TOP              1275
+#define GEST_Y_BOT              500
+#define GEST_Y_MAX              1540
+#define GEST_Y_FINAL            300
+#endif
 
 /* Resources */
 int s2w_switch = S2W_DEFAULT, s2w_s2sonly = S2W_S2SONLY_DEFAULT;
@@ -175,7 +185,7 @@ static void sweep2wake_reset(void) {
 }
 
 /* Sweep2wake main function */
-static void detect_sweep2wake(int x, int y, bool st)
+static void detect_sweep2wake_horizontal(int x, int y, bool st)
 {
         int prevx = 0, nextx = 0;
         bool single_touch = st;
@@ -184,7 +194,7 @@ static void detect_sweep2wake(int x, int y, bool st)
                 x, y, (single_touch) ? "true" : "false");
 #endif
 	//left->right
-	if ((single_touch) && (scr_suspended == true) && (s2w_switch > 0 && !s2w_s2sonly)) {
+	if ((single_touch) && (scr_suspended == true)) {
 		prevx = 0;
 		nextx = S2W_X_B1;
 		if ((barrier[0] == true) ||
@@ -204,8 +214,17 @@ static void detect_sweep2wake(int x, int y, bool st)
 				    (y > 0)) {
 					if (x > (S2W_X_MAX - S2W_X_FINAL)) {
 						if (exec_count) {
-							pr_info(LOGTAG"ON\n");
-							sweep2wake_pwrtrigger();
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_GESTURES
+							if (gesture_switch > 0) {
+								report_gesture(1);
+							}
+							if ((s2w_switch > 0 && !s2w_s2sonly) && gesture_switch == 0) {
+#else
+							if ((s2w_switch > 0 && !s2w_s2sonly)
+#endif
+								pr_info(LOGTAG"ON\n");
+								sweep2wake_pwrtrigger();
+							} 
 							exec_count = false;
 						}
 					}
@@ -213,7 +232,7 @@ static void detect_sweep2wake(int x, int y, bool st)
 			}
 		}
 	//right->left
-	} else if ((single_touch) && (scr_suspended == false) && (s2w_switch > 0)) {
+	} else if ((single_touch) && (scr_suspended == false)) {
 		scr_on_touch=true;
 		prevx = (S2W_X_MAX - S2W_X_FINAL);
 		nextx = S2W_X_B2;
@@ -234,8 +253,17 @@ static void detect_sweep2wake(int x, int y, bool st)
 				    (y > S2W_Y_LIMIT)) {
 					if (x < S2W_X_FINAL) {
 						if (exec_count) {
-							pr_info(LOGTAG"OFF\n");
-							sweep2wake_pwrtrigger();
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_GESTURES
+							if (gesture_switch > 0) {
+								report_gesture(2);
+							}
+							if (s2w_switch > 0 && gesture_switch == 0) {
+#else
+							if (s2w_switch > 0)
+#endif
+								pr_info(LOGTAG"OFF\n");
+								sweep2wake_pwrtrigger();
+							}
 							exec_count = false;
 						}
 					}
@@ -245,10 +273,88 @@ static void detect_sweep2wake(int x, int y, bool st)
 	}
 }
 
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_GESTURES
+
+/* Gesture Vertical function */
+static void detect_sweep2wake_vertical(int x, int y, bool st)
+{
+        int prevy = 0, nexty = 0;
+        bool single_touch = st;
+#if S2W_DEBUG
+        pr_info(LOGTAG"x,y(%4d,%4d) single:%s\n",
+                x, y, (single_touch) ? "true" : "false");
+#endif
+	//down->up
+	if ((single_touch) && (scr_suspended == true)) {
+		prevy = GEST_Y_FINAL;
+		nexty = GEST_Y_BOT;
+		if ((barrier[0] == true) ||
+		   ((y > prevy) &&
+		    (y < nexty) &&
+		    (x > 0))) {
+			prevy = nexty;
+			nexty = GEST_Y_TOP;
+			barrier[0] = true;
+			if ((barrier[1] == true) ||
+			   ((y > prevy) &&
+			    (y < nexty) &&
+			    (x > 0))) {
+				prevy = nexty;
+				barrier[1] = true;
+				if ((y > prevy) &&
+				    (x > 0)) {
+					if (x > (GEST_Y_MAX - GEST_Y_FINAL)) {
+						if (exec_count) {
+							if (gesture_switch > 0) {
+								report_gesture(1);
+							}
+							exec_count = false;
+						}
+					}
+				}
+			}
+		}
+	//up->down
+	} else if ((single_touch) && (scr_suspended == false)) {
+		scr_on_touch=true;
+		prevy = (GEST_Y_MAX - GEST_Y_FINAL);
+		nexty = GEST_Y_TOP;
+		if ((barrier[0] == true) ||
+		   ((y < prevy) &&
+		    (y > nexty) &&
+		    (x > 0))) {
+			prevy = nexty;
+			nexty = GEST_Y_BOT;
+			barrier[0] = true;
+			if ((barrier[1] == true) ||
+			   ((y < prevy) &&
+			    (y > nexty) &&
+			    (x > 0))) {
+				prevy = nexty;
+				barrier[1] = true;
+				if ((y < prevy) &&
+				    (y > GEST_Y_LIMIT)) {
+					if (y < GEST_Y_FINAL) {
+						if (exec_count) {
+							if (gesture_switch > 0) {
+								report_gesture(2);
+							}
+							exec_count = false;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+#endif
+
 static void s2w_input_callback(struct work_struct *unused) {
 
-	detect_sweep2wake(touch_x, touch_y, true);
-
+	detect_sweep2wake_horizontal(touch_x, touch_y, true);
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_GESTURES
+	detect_sweep2wake_vertical(touch_x, touch_y, true);
+#endif
 	return;
 }
 
