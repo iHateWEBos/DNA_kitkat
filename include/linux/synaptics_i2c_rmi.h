@@ -176,13 +176,13 @@ enum {
 	INTR_SOURCE,
 	FUNCTION
 };
-extern uint8_t touchscreen_is_on(void);
-
 
 #ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
-/* Sweep2Wake */
 extern void sweep2wake_setdev(struct input_dev * input_device);
-extern void sweep2wake_setleddev(struct led_classdev * led_dev);
+extern int in_phone_call;
 #endif
+
+extern uint8_t touchscreen_is_on(void);  
+
 extern uint8_t getPowerKeyState(void);
 #endif 

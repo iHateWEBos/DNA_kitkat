@@ -27,6 +27,11 @@
 #include <mach/qdsp6v2/apr.h>
 #include "slim-msm.h"
 
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#include <linux/synaptics_i2c_rmi.h>
+int in_phone_call = 0;
+#endif
+
 #define MSM_SLIM_NAME	"msm_slim_ctrl"
 #define SLIM_ROOT_FREQ 24576000
 
@@ -939,6 +944,9 @@ send_capability:
 			txn.len = 2;
 			txn.wbuf = wbuf;
 			gen_ack = true;
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+			in_phone_call = 1;
+#endif
 			ret = msm_xfer_msg(&dev->ctrl, &txn);
 			break;
 		case SLIM_USR_MC_DISCONNECT_PORT:
@@ -951,6 +959,9 @@ send_capability:
 			txn.mt = SLIM_MSG_MT_CORE;
 			txn.wbuf = wbuf;
 			gen_ack = true;
+#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+			in_phone_call = 0;
+#endif
 			ret = msm_xfer_msg(&dev->ctrl, &txn);
 			break;
 		case SLIM_MSG_MC_REPORT_ABSENT:

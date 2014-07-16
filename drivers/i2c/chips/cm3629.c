@@ -579,9 +579,7 @@ static void report_psensor_input_event(struct cm3629_info *lpi, int interrupt_fl
 	} else {
 		val = (interrupt_flag == 2) ? 0 : 1;
 	}
-#ifdef CONFIG_POCKET_DETECT
 	ps_near = !val;
-#endif
 
 	if (lpi->ps_debounce == 1 && lpi->mfg_mode != MFG_MODE) {
 		if (val == 0) {
@@ -801,7 +799,7 @@ static void sensor_irq_do_work(struct work_struct *work)
 	}
 
 	if (!(add & 0x3F)) { 
-		if (inter_error < 30) {
+		if (inter_error < 10) {
 			D("[PS][cm3629 warning]%s unkown interrupt: 0x%x!\n",
 			__func__, add);
 			inter_error++ ;
@@ -2563,6 +2561,7 @@ int power_key_check_in_pocket(void)
 	D("[cm3629] %s ls_adc = %d, ls_level = %d, ls_dark %d\n", __func__, ls_adc, ls_level, ls_dark);
 
 	psensor_enable(lpi);
+	msleep(50);
 	ret = get_ps_adc_value(&ps1_adc, &ps2_adc);
 	if (ps1_adc > pocket_thd)
 		ps_near = 1;
@@ -2574,7 +2573,6 @@ int power_key_check_in_pocket(void)
 	return (ls_dark && ps_near);
 }
 
-#ifdef CONFIG_POCKET_DETECT
 int pocket_detection_check(void)
 {
 	struct cm3629_info *lpi = lp_info;
@@ -2592,7 +2590,6 @@ int pocket_detection_check(void)
 	pocket_mode_flag = 0;
 	return (ps_near);
 }
-#endif
 
 int psensor_enable_by_touch_driver(int on)
 {
