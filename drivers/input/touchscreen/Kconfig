@@ -1022,5 +1022,9 @@ config TOUCHSCREEN_HIMAX
 		depends on I2C
 		help
 		This enables support for HIMAX HM852xD over I2C based touchscreens.
+		
+config TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+        tristate "Sweep2Wake for SYNAPTICS_3k based touchscreens"
+        default y
 
 endif
