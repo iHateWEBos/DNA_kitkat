@@ -36,6 +36,10 @@
 #include <mach/perflock.h>
 #endif
 
+#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
+static DEFINE_PER_CPU(bool, set_default_min);
+#endif
+ 
 #ifdef CONFIG_SMP
 struct cpufreq_work_struct {
 	struct work_struct work;
@@ -280,23 +284,19 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	int cur_freq;
 	int index;
 	struct cpufreq_frequency_table *table;
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
-	int setting_defaults = 0;
-#endif
 #ifdef CONFIG_SMP
 	struct cpufreq_work_struct *cpu_work = NULL;
 #endif
 
+#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
+	bool *have_set_default_min = &per_cpu(set_default_min, policy->cpu);
+#endif
 
 	table = cpufreq_frequency_get_table(policy->cpu);
 	if (table == NULL)
 		return -ENODEV;
 	if (cpu_is_msm8625())
 		cpumask_setall(policy->cpus);
-
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
-	setting_defaults = (policy->min == 0);
-#endif
 
 	if (cpufreq_frequency_table_cpuinfo(policy, table)) {
 #ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
@@ -305,7 +305,8 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 #endif
 	}
 #ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
-	if (setting_defaults) {
+	if (! *have_set_default_min) {
+		*have_set_default_min = true;
 		pr_info("cpufreq: setting default min to %d", CONFIG_MSM_CPU_FREQ_DEFAULT_MIN);
 		policy->min = CONFIG_MSM_CPU_FREQ_DEFAULT_MIN;
 	}

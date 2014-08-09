@@ -34,7 +34,7 @@
 
 static struct cpufreq_driver *cpufreq_driver;
 
-static bool sys_locked = false;
+static bool sys_locked = 1;
 
 static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
 #ifdef CONFIG_HOTPLUG_CPU
@@ -414,8 +414,8 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	char	str_governor[16];
 	struct cpufreq_policy new_policy;
 
-	if (sys_locked)
-		return -EINVAL;
+//	if (sys_locked)
+//		return -EINVAL;
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
@@ -567,20 +567,6 @@ static struct attribute *default_attrs[] = {
 	NULL
 };
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_CPU_VOLTAGE_TABLE
-static struct attribute *vddtbl_attrs[] = {
-	&vdd_levels.attr,
-	NULL
-};
-
-static struct attribute_group vddtbl_attr_group = {
-	.attrs = vddtbl_attrs,
-	.name = "vdd_table",
-};
-#endif	/* CONFIG_CPU_VOLTAGE_TABLE */
-
 static ssize_t show_locked(struct kobject *a, struct attribute *b, char *buf)
 {
 	return sprintf(buf, "%d\n", sys_locked);
@@ -614,7 +600,6 @@ static struct attribute_group locked_attr_group = {
 	.name = "locked",
 };
 
->>>>>>> f95a7ea... cpufreq: add ability to lock the /sys controls
 struct kobject *cpufreq_global_kobject;
 EXPORT_SYMBOL(cpufreq_global_kobject);
 
@@ -942,10 +927,14 @@ static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 #ifdef CONFIG_HOTPLUG_CPU
 	for_each_online_cpu(sibling) {
 		struct cpufreq_policy *cp = per_cpu(cpufreq_cpu_data, sibling);
-		if (cp && cp->governor &&
-		    (cpumask_test_cpu(cpu, cp->related_cpus))) {
-			policy->governor = cp->governor;
-			found = 1;
+		if (cp && cp->governor) {
+  			policy->governor = cp->governor;
+			policy->min = cp->min;
+			policy->max = cp->max;
+			policy->user_policy.min = cp->user_policy.min;
+			policy->user_policy.max = cp->user_policy.max;
+  			found = 1;
+			//pr_info("sibling: found sibling!\n");
 			break;
 		}
 	}
@@ -1797,6 +1786,7 @@ EXPORT_SYMBOL_GPL(cpufreq_unregister_driver);
 static int __init cpufreq_core_init(void)
 {
 	int cpu;
+	int rc;
 
 	if (cpufreq_disabled())
 		return -ENODEV;
@@ -1809,13 +1799,7 @@ static int __init cpufreq_core_init(void)
 	cpufreq_global_kobject = kobject_create_and_add("cpufreq", &cpu_subsys.dev_root->kobj);
 	BUG_ON(!cpufreq_global_kobject);
 	register_syscore_ops(&cpufreq_syscore_ops);
-<<<<<<< HEAD
-=======
 	rc = sysfs_create_group(cpufreq_global_kobject, &locked_attr_group);
-#ifdef CONFIG_CPU_VOLTAGE_TABLE
-	rc = sysfs_create_group(cpufreq_global_kobject, &vddtbl_attr_group);
-#endif	/* CONFIG_CPU_VOLTAGE_TABLE */
->>>>>>> f95a7ea... cpufreq: add ability to lock the /sys controls
 
 	return 0;
 }
