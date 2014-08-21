@@ -1400,11 +1400,11 @@ if (dbs_tuners_ins.gboost) {
 		}
 
 		if (dbs_tuners_ins.powersave_bias)
-			freq_next = powersave_bias_target(policy, freq_next, CPUFREQ_RELATION_L);
+			freq_next = powersave_bias_target(policy, freq_next, CPUFREQ_RELATION_C);
 
 		trace_cpufreq_interactive_target (policy->cpu, cur_load, policy->cur, freq_next);
 		__cpufreq_driver_target(policy, freq_next,
-			CPUFREQ_RELATION_L);
+			CPUFREQ_RELATION_C);
 		trace_cpufreq_interactive_down (policy->cpu, freq_next, policy->cur);
 	}
 }
