@@ -33,7 +33,6 @@
 #include <trace/events/power.h>
 
 static struct cpufreq_driver *cpufreq_driver;
-
 static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
 #ifdef CONFIG_HOTPLUG_CPU
 struct cpufreq_cpu_save_data {
@@ -886,14 +885,10 @@ static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 #ifdef CONFIG_HOTPLUG_CPU
 	for_each_online_cpu(sibling) {
 		struct cpufreq_policy *cp = per_cpu(cpufreq_cpu_data, sibling);
-		if (cp && cp->governor) {
-  			policy->governor = cp->governor;
-			policy->min = cp->min;
-			policy->max = cp->max;
-			policy->user_policy.min = cp->user_policy.min;
-			policy->user_policy.max = cp->user_policy.max;
-  			found = 1;
-			//pr_info("sibling: found sibling!\n");
+		if (cp && cp->governor &&
+		    (cpumask_test_cpu(cpu, cp->related_cpus))) {
+			policy->governor = cp->governor;
+			found = 1;
 			break;
 		}
 	}
@@ -1745,7 +1740,6 @@ EXPORT_SYMBOL_GPL(cpufreq_unregister_driver);
 static int __init cpufreq_core_init(void)
 {
 	int cpu;
-	int rc;
 
 	if (cpufreq_disabled())
 		return -ENODEV;
