@@ -34,7 +34,7 @@
 
 static struct cpufreq_driver *cpufreq_driver;
 
-static bool sys_locked = false;
+static bool sys_locked = 1;
 
 static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
 #ifdef CONFIG_HOTPLUG_CPU
