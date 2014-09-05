@@ -578,7 +578,7 @@ static struct acpuclk_data acpuclk_krait_data = {
 unsigned long acpuclk_krait_power_collapse(void)
 {
 	unsigned long rate = acpuclk_get_rate(smp_processor_id());
-	acpuclk_krait_set_rate(smp_processor_id(), 162000, SETRATE_PC);
+	acpuclk_krait_set_rate(smp_processor_id(), 384000, SETRATE_PC);
 	return rate;
 }
 #endif

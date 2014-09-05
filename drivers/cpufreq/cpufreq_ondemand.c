@@ -1172,7 +1172,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 	unsigned int max_load_other_cpu = 0;
 	struct cpufreq_policy *policy;
-	unsigned int j, prev_load = 0, freq_next;
+	unsigned int j, prev_load = 0, freq_next, min_f, max_f;
 
 	static unsigned int phase = 0;
 	static unsigned int counter = 0;
@@ -1224,6 +1224,10 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 				dbs_tuners_ins.up_threshold_any_cpu_load;
 		}
 	}
+	
+	min_f = policy->cpuinfo.min_freq;
+	max_f = policy->cpuinfo.max_freq;
+	freq_next = min_f + max_load_freq * (max_f - min_f) / 100;
 
 	cpufreq_notify_utilization(policy, load_at_max_freq);
 

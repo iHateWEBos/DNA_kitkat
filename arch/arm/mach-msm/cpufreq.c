@@ -288,10 +288,6 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	struct cpufreq_work_struct *cpu_work = NULL;
 #endif
 
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
-	bool *have_set_default_min = &per_cpu(set_default_min, policy->cpu);
-#endif
-
 	table = cpufreq_frequency_get_table(policy->cpu);
 	if (table == NULL)
 		return -ENODEV;
@@ -304,18 +300,6 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 		policy->cpuinfo.max_freq = CONFIG_MSM_CPU_FREQ_MAX;
 #endif
 	}
-#ifdef CONFIG_MSM_CPU_FREQ_SET_DEFAULT_MIN
-	if (! *have_set_default_min) {
-		*have_set_default_min = true;
-		pr_info("cpufreq: setting default min to %d", CONFIG_MSM_CPU_FREQ_DEFAULT_MIN);
-		policy->min = CONFIG_MSM_CPU_FREQ_DEFAULT_MIN;
-	}
-#endif
-
-#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
-	policy->min = CONFIG_MSM_CPU_FREQ_MIN;
-	policy->max = CONFIG_MSM_CPU_FREQ_MAX;
-#endif
 
 #ifdef CONFIG_ARCH_APQ8064
 	if( board_mfg_mode() == 5) {
