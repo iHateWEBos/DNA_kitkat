@@ -330,8 +330,8 @@ exit_0:
 	return ret;
 }
 #ifndef STATIC
-EXPORT_SYMBOL_GPL(lz4_decompress_unknownoutputsize);
+EXPORT_SYMBOL(lz4_decompress);
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("LZ4 Decompressor");
 #endif
